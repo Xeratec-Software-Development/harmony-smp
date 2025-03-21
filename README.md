@@ -1,3 +1,22 @@
+# Xeratec Notes
+## Inplace build guide
+First verify that you are able to build the project:
+```
+mvn install -DskipTests -DskipITs
+```
+Set the following environment variables:
+```
+export BUILD_REMOTE_USER=<your-remote-user>
+export BUILD_REMOTE_HOST=<your-remote-host>
+export BUILD_SSH_PEM=<your-ssh-pem>
+```
+Run the following command:
+```
+./build.sh <file-name>
+```
+with file-name being the path to the file you would like to inplace replace in the remote server.
+
+
 [![Go to Harmony Community Slack](https://img.shields.io/badge/Go%20to%20Community%20Slack-grey.svg)](https://harmonyedelivery.slack.com/)
 [![Get invited](https://img.shields.io/badge/No%20Slack-Get%20invited-green.svg)](https://edelivery.digital/harmony-edelivery-access-community)
 [![License badge](https://img.shields.io/badge/license-EUPL-blue.svg)](LICENSE.md)
