@@ -12,6 +12,7 @@ This directory contains Kubernetes manifests for deploying Harmony SMP to a Kube
 ## Architecture
 
 The deployment consists of:
+
 - **MySQL Database** (1 replica) - Persistent storage for SMP data
 - **Harmony SMP Application** (1 replica) - Spring Boot application
 - **Ingress** - External HTTP access (optional)
@@ -115,11 +116,13 @@ Then access at: http://localhost:8084/smp/
 If you deployed the Ingress resource:
 
 1. **Install Nginx Ingress Controller** (if not already installed):
+
    ```bash
    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
    ```
 
 2. **Add hostname to /etc/hosts** (for local testing):
+
    ```bash
    echo "$(kubectl get ingress harmony-smp-ingress -n harmony-smp -o jsonpath='{.status.loadBalancer.ingress[0].ip}') harmony-smp.local" | sudo tee -a /etc/hosts
    ```
@@ -164,6 +167,7 @@ kubectl rollout restart deployment/harmony-smp -n harmony-smp
 ### Resource Limits
 
 Adjust CPU and memory in the deployment files:
+
 - **MySQL**: `k8s/mysql-deployment.yaml`
 - **SMP App**: `k8s/smp-deployment.yaml`
 
@@ -327,6 +331,7 @@ kubectl port-forward svc/harmony-smp 8084:8084 -n harmony-smp
 ## Support
 
 For issues or questions:
+
 - **Harmony Documentation**: https://github.com/nordic-institute/harmony-common/
 - **Kubernetes Documentation**: https://kubernetes.io/docs/
 - **Project Issues**: Check the repository issues
