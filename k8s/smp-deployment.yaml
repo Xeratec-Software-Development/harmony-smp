@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: harmony-smp
+  namespace: harmony-smp
+  labels:
+    app: harmony-smp
+    component: application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: harmony-smp
+  template:
+    metadata:
+      labels:
+        app: harmony-smp
+        component: application
+    spec:
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done;']
+      containers:
+      - name: harmony-smp
+        # TODO: Replace with your actual image
+        # Build instructions in k8s/README.md
+        image: harmony-smp:2.2.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SMP_DB_SCHEMA
+          value: "smp"
+        - name: SMP_DB_USER
+          value: "smp"
+        - name: SMP_DB_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-password
+        - name: SMP_INIT_PROPERTIES
+          valueFrom:
+            configMapKeyRef:
+              name: smp-config
+              key: smp.init.properties
+        - name: SMP_INIT_PROPERTY_DELIMITER
+          value: "||"
+        - name: SMP_PORT
+          value: "8084"
+        - name: JDK_VERSION
+          value: "11"
+        ports:
+        - containerPort: 8084
+          name: http
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /smp/
+            port: 8084
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 20
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /smp/
+            port: 8084
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: smp-data
+          mountPath: /opt/smp/data
+      volumes:
+      - name: smp-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: harmony-smp
+  namespace: harmony-smp
+  labels:
+    app: harmony-smp
+    component: application
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8084
+    targetPort: 8084
+    protocol: TCP
+    name: http
+  selector:
+    app: harmony-smp

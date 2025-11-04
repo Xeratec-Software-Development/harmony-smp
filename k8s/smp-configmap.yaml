@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smp-config
+  namespace: harmony-smp
+data:
+  # Server configuration
+  server.port: "8084"
+  
+  # Database configuration
+  smp.jdbc.hibernate.dialect: "org.hibernate.dialect.MySQL8Dialect"
+  smp.jdbc.driver: "com.mysql.cj.jdbc.Driver"
+  smp.jdbc.url: "jdbc:mysql://mysql:3306/smp?useSSL=false&allowPublicKeyRetrieval=true"
+  smp.jdbc.user: "smp"
+  
+  # SMP initialization properties (separated by ||)
+  smp.init.properties: |
+    smp.passwordPolicy.expired.forceChange=false
+    ||smp.automation.authentication.external.tls.SSLClientCert.enabled=false
+    ||smp.cluster.enabled=false
+    ||smp.mode.development=false
+    ||smp.ui.authentication.types=PASSWORD
+    ||bdmsl.integration.enabled=false
